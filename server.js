@@ -9,8 +9,8 @@ const configFile = fs.readFileSync('config.json')
 const config = JSON.parse(configFile)
 
 if (config.env === 'dev') {
-    app.listen(3000, () => {
-        console.log(`Listening at 3000`)
+    app.listen(3085, () => {
+        console.log('HTTP server running on port 3085')
     })
 
     app.use(function (request, response, next) {
@@ -31,8 +31,8 @@ if (config.env === 'dev') {
 
     const httpsServer = https.createServer(credentials, app)
 
-    httpsServer.listen(83096, () => {
-        console.log('HTTPS Server running on port 3000')
+    httpsServer.listen(3085, () => {
+        console.log('HTTPS server running on port 3085')
     })
 
     app.use(function (request, response, next) {
