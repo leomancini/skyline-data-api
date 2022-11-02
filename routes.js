@@ -67,7 +67,7 @@ async function filterImage(params) {
     return image
 }
 
-router.get('/filter', async (req, res) => {
+router.get('/skyline/filter', async (req, res) => {
     let datetime = moment().subtract(1, 'minutes').format('YYYY-MM-DD-HH-mm')
 
     let url = `http://skyline.noshado.ws/nest-cam-timelapse/images/SKYLINE/${datetime}.jpg`
