@@ -67,19 +67,19 @@ async function filterImage(params) {
     return image
 }
 
+let datetime = moment().subtract(1, 'minutes').format('YYYY-MM-DD-HH-mm')
+
+let url = `http://skyline.noshado.ws/nest-cam-timelapse/images/SKYLINE/${datetime}.jpg`
+
+const imageResponse = await axios({url: url, responseType: 'arraybuffer'})
+const buffer = Buffer.from(imageResponse.data, 'binary')
+
+let buildings = {
+    'EmpireStateBuilding': { left: 1060, top: 375, width: 40, height: 80 },
+    'UNBuilding': { left: 1590, top: 450, width: 80, height: 150 }
+}
+
 router.get('/skyline/filter', async (req, res) => {
-    let datetime = moment().subtract(1, 'minutes').format('YYYY-MM-DD-HH-mm')
-
-    let url = `http://skyline.noshado.ws/nest-cam-timelapse/images/SKYLINE/${datetime}.jpg`
-
-    const imageResponse = await axios({url: url, responseType: 'arraybuffer'})
-    const buffer = Buffer.from(imageResponse.data, 'binary')
-
-    let buildings = {
-        'EmpireStateBuilding': { left: 1060, top: 375, width: 40, height: 80 },
-        'UNBuilding': { left: 1590, top: 450, width: 80, height: 150 }
-    }
-
     if (req.query.building) {
         const image = await filterImage({
             buffer,
@@ -93,6 +93,60 @@ router.get('/skyline/filter', async (req, res) => {
 
         res.set({'Content-Type': 'image/jpg'})
         res.send(image)
+    } else {
+        res.send({
+            'error': 'Please add type and building params!'
+        })
+    }
+})
+
+router.get('/skyline/hash', async (req, res) => {
+    if (req.query.building) {
+        const size = {
+            width: null,
+            height: 200,
+            scale: 10
+        }
+
+        const image1 = await filterImage({
+            buffer,
+            type: 3,
+            crop: buildings[req.query.building],
+            size
+        })
+
+        const image2 = await sharp(image1)
+            .resize(8, null, { kernel: sharp.kernel.nearest })
+            .toBuffer()
+
+        const image3 = await sharp(image2)
+            .resize(size.width ? Math.round(size.width / size.scale) : null, size.height ? Math.round(size.height / size.scale) : null, { kernel: sharp.kernel.nearest })
+            .toBuffer()
+
+        let imageFinal
+
+        if (req.query.showHashImage) {
+            imageFinal = await sharp(image3)
+                .toBuffer()
+
+            res.set({'Content-Type': 'image/jpg'})
+            res.send(imageFinal)
+        } else {
+            imageFinal = await sharp(image3)
+                .raw()
+                .toBuffer({ resolveWithObject: true })
+                
+            const data = imageFinal.data.toJSON().data
+            const dataString = data.join('')
+
+            const output = {
+                datetime,
+                hash: dataString
+            }
+
+            res.set({'Content-Type': 'application/json'})
+            res.send(output)
+        }
     } else {
         res.send({
             'error': 'Please add type and building params!'
