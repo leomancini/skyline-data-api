@@ -42,6 +42,8 @@ if (config.env === 'dev') {
     })
 }
 
-import router from './routes.js'
+import hash from './routes/hash.js'
+import filter from './routes/filter.js'
 
-app.use(router)
+app.use('/skyline/hash', hash);
+app.use('/skyline/filter', filter);
