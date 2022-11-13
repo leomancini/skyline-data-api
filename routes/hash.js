@@ -48,6 +48,7 @@ router.get('/', async function(req, res) {
           const dataString = data.join('')
 
           const output = {
+              building: req.query.building,
               datetime,
               hash: dataString
           }
