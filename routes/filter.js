@@ -3,12 +3,12 @@ import express from 'express'
 import filter from '../processing.js'
 import initialize from '../initialize.js'
 
-let { datetime, url, buffer, buildings } = await initialize()
-
 const router = express.Router()
 
 router.get('/', async (req, res) => {
   if (req.query.building) {
+      const { datetime, url, buffer, buildings } = await initialize()
+
       const image = await filter({
           buffer,
           type: req.query.type ? parseInt(req.query.type) : null,

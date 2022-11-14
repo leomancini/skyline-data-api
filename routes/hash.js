@@ -4,12 +4,12 @@ import sharp from 'sharp'
 import filter from '../processing.js'
 import initialize from '../initialize.js'
 
-let { datetime, url, buffer, buildings } = await initialize()
-
 const router = express.Router()
 
 router.get('/', async function(req, res) {
   if (req.query.building) {
+      const { datetime, url, buffer, buildings } = await initialize()
+
       const size = {
           width: null,
           height: 200,
