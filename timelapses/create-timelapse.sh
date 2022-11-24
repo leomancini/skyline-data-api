@@ -99,7 +99,7 @@ printf "\n"
 
 printf "${CYAN}Starting timelapse creation...${NC}\\n\n"
 
-ffmpeg -loglevel error -stats -r $FPS -pattern_type glob -i "./.auto-timelapse-temp/$RUNTIME/*.jpg" -s "$((WIDTH))x$((HEIGHT))" -vcodec libx264 ./$START-to-$END-at-$FPS-fps.mp4
+ffmpeg -loglevel error -stats -r $FPS -pattern_type glob -i "./.auto-timelapse-temp/$RUNTIME/*.jpg" -s "$((WIDTH))x$((HEIGHT))" -vcodec libx264 ./$BUILDING-filter-type-$FILTER_TYPE-$START-to-$END-at-$FPS-fps.mp4
 
 printf "\n${GREEN}# # # # FINISHED TIMELAPSE CREATION # # # #${NC}\\n\n"
 
@@ -108,6 +108,6 @@ echo "Cleaning up..."
 rm -r ./.auto-timelapse-temp/
 
 printf "\n${GREEN}# # # # DONE # # # #${NC}\\n\n"
-printf "Output: ${PURPLE}$START-to-$END-at-$FPS-fps.mp4${NC}\\n\n"
+printf "Output: ${PURPLE}$BUILDING-filter-type-$FILTER_TYPE-$START-to-$END-at-$FPS-fps.mp4${NC}\\n\n"
 
 open ./$START-to-$END-at-$FPS-fps.mp4

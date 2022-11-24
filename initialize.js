@@ -11,8 +11,12 @@ export default async function initialize(datetime) {
     let buffer
 
     try {
-        let imageResponse = await axios({url: url, responseType: 'arraybuffer'})
-        buffer = Buffer.from(imageResponse.data, 'binary')
+        let imageResponse = await axios({ url: url, responseType: 'arraybuffer' })
+        if (imageResponse.data.length > 128) {
+            buffer = Buffer.from(imageResponse.data, 'binary')
+        } else {
+            buffer = null
+        }
     } catch (err) {
         buffer = null
     }
