@@ -7,7 +7,7 @@ const router = express.Router()
 
 router.get('/', async (req, res) => {
   if (req.query.building) {
-      const { datetime, url, buffer, buildings } = await initialize()
+      const { datetime, url, buffer, buildings } = await initialize(req.query.datetime)
 
       const image = await filter({
           buffer,

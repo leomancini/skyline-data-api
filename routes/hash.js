@@ -8,7 +8,7 @@ const router = express.Router()
 
 router.get('/', async function(req, res) {
   if (req.query.building) {
-      const { datetime, url, buffer, buildings } = await initialize()
+      const { datetime, url, buffer, buildings } = await initialize(req.query.datetime)
 
       const size = {
           width: null,

@@ -1,10 +1,14 @@
 import axios from 'axios'
 import moment from 'moment'
 
-export default async function initialize() {
-    let datetime = moment().subtract(1, 'minutes').format('YYYY-MM-DD-HH-mm')
+export default async function initialize(datetime) {
+    if (!datetime) {
+        datetime = moment().subtract(1, 'minutes').format('YYYY-MM-DD-HH-mm')
+    } 
 
     let url = `http://skyline.noshado.ws/nest-cam-timelapse/images/SKYLINE/${datetime}.jpg`
+
+    console.log(datetime)
 
     const imageResponse = await axios({url: url, responseType: 'arraybuffer'})
     const buffer = Buffer.from(imageResponse.data, 'binary')
