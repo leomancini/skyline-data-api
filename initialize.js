@@ -8,10 +8,14 @@ export default async function initialize(datetime) {
 
     let url = `http://skyline.noshado.ws/nest-cam-timelapse/images/SKYLINE/${datetime}.jpg`
 
-    console.log(datetime)
+    let buffer
 
-    const imageResponse = await axios({url: url, responseType: 'arraybuffer'})
-    const buffer = Buffer.from(imageResponse.data, 'binary')
+    try {
+        let imageResponse = await axios({url: url, responseType: 'arraybuffer'})
+        buffer = Buffer.from(imageResponse.data, 'binary')
+    } catch (err) {
+        buffer = null
+    }
 
     let buildings = {
         'FreedomTower': { left: 141, top: 450, width: 18, height: 66 },
