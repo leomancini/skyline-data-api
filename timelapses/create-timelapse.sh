@@ -65,7 +65,7 @@ printf "Creating temporary directory on local machine...\\n"
 mkdir -p ./.auto-timelapse-temp/
 mkdir ./.auto-timelapse-temp/$RUNTIME/
 
-printf "Determining size of images...\\n"
+printf "Calculating dimension of images...\\n"
 
 IMAGE_DIMENSIONS=$(curl -r 0-25 --silent "$IMAGE_PATH&datetime=$START" | identify -format "%wx%h" -)
 IMAGE_DIMENSIONS_PARTS=(${IMAGE_DIMENSIONS//x/ })
@@ -77,25 +77,46 @@ round() {
 WIDTH=$(round $((IMAGE_DIMENSIONS_PARTS[0])))
 HEIGHT=$(round $((IMAGE_DIMENSIONS_PARTS[1])))
 
-printf "Downloading images...\\n\n"
-
 # Based on: https://stackoverflow.com/questions/4434782/loop-from-start-date-to-end-date-in-mac-os-x-shell-script
 sDateTs=`date -j -f "%Y-%m-%d-%H-%M" $START "+%s"`
 eDateTs=`date -j -f "%Y-%m-%d-%H-%M" $END "+%s"`
 dateTs=$sDateTs
+dateTsTotalCalc=$sDateTs
 offset=60
+total=0
 i=0
+
+printf "Calculating total number of images...\\n"
+
+while [ "$dateTsTotalCalc" -le "$eDateTs" ]
+do
+    dateTsTotalCalc=$(($dateTsTotalCalc+$offset))
+    ((total=total+1))
+done
+
+# Based on: https://github.com/fearside/ProgressBar/
+function renderProgressBar {
+    let _progress=(${1}*100/${2}*100)/100
+    let _done=(${_progress}*4)/10
+    let _left=40-$_done
+    _fill=$(printf "%${_done}s")
+    _empty=$(printf "%${_left}s")
+
+    printf "\rDownloading ${3}... Progress: [${_fill// /#}${_empty// /-}] ${_progress}%%"
+}
+
+printf "Downloading images..."
 
 while [ "$dateTs" -le "$eDateTs" ]
 do
     date=`date -j -f "%s" $dateTs "+%Y-%m-%d-%H-%M"`
     curl "$IMAGE_PATH&datetime=$date" --output ./.auto-timelapse-temp/$RUNTIME/$date.jpg --silent
-    printf ">> $date\\n"
+    renderProgressBar ${i} ${total} ${date}
     dateTs=$(($dateTs+$offset))
     ((i=i+1))
 done
 
-printf "\n"
+printf "\rDownloaded ${total} images...\033[K\n"
 
 printf "${CYAN}Starting timelapse creation...${NC}\\n\n"
 
@@ -110,4 +131,4 @@ rm -r ./.auto-timelapse-temp/
 printf "\n${GREEN}# # # # DONE # # # #${NC}\\n\n"
 printf "Output: ${PURPLE}$BUILDING-filter-type-$FILTER_TYPE-$START-to-$END-at-$FPS-fps.mp4${NC}\\n\n"
 
-open ./$START-to-$END-at-$FPS-fps.mp4
+open ./$BUILDING-filter-type-$FILTER_TYPE-$START-to-$END-at-$FPS-fps.mp4
